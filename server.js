@@ -1,5 +1,5 @@
 const http = require('http');
-
+require('dotenv').config();
 const server = http.createServer((req, res) => {
     if (req.method === 'GET' && req.url === '/') {
         res.writeHead(200, { 'Content-Type': 'text/plain' });
@@ -10,7 +10,7 @@ const server = http.createServer((req, res) => {
     }
 });
 
-const PORT = 3000;
+const PORT = process.env.PORT;
 
 server.listen(PORT, () => {
     console.log(`Server in esecuzione su http://localhost:${PORT}`);
