@@ -1,0 +1,26 @@
+{
+  "name": "nodejs_fs_backend",
+  "version": "1.0.0",
+  "description": "NodeJS Rest Api Backend Api Service",
+  "main": "server.js",
+  "scripts": {
+    "test": "jest --coverage",
+    "start": "nodemon server"
+    
+  },
+  "keywords": [
+    "NodeJS",
+    "RestAPI",
+    "service"
+  ],
+  "author": "Vito",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "expres": "^0.0.5"
+  },
+  "devDependencies": {
+    "jest": "^29.6.2",
+    "nodemon": "^3.0.1"
+  }
+}
