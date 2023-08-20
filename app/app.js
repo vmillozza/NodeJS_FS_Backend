@@ -1,5 +1,5 @@
 const express = require('express');
-
+const cors = require('cors');
 const app = express();
 // app.use(express.json()); è un'espressione comune utilizzata nelle applicazioni Express.js per aggiungere il middleware express.json(). Questo middleware analizza i corpi delle richieste in entrata codificati come JSON.
 
@@ -46,17 +46,19 @@ app.use(express.urlencoded({extended:true}));
 // 5. `next();`: Questa funzione passa il controllo al prossimo middleware o al gestore di route. È importante chiamare `next()` per garantire che la pipeline delle richieste continui a funzionare correttamente.
 
 // In sintesi, questo middleware configura le risposte del server per gestire le richieste da origini diverse (CORS) in un ambiente Express.js.
-app.use((req,res,next)=>{
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    if(req.method == 'OPTION'){
-        res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-    }
-    next();
-});
+// app.use((req,res,next)=>{
+//     res.header("Access-Control-Allow-Origin", "*");
+//     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+//     if(req.method == 'OPTION'){
+//         res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+//     }
+//     next();
+// });
+app.use(cors());
 app.get('/', (req, res,next) => {
     res.status('200').json({message:'Service is up'});
     next();
 });
+//routers
 
 module.exports = app;

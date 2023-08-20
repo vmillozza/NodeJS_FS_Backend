@@ -1,4 +1,5 @@
 const http = require('http');
+const app = require('./app/app');
 require('dotenv').config();
 const server = http.createServer((req, res) => {
     if (req.method === 'GET' && req.url === '/') {
