@@ -54,11 +54,25 @@ app.use(express.urlencoded({extended:true}));
 //     }
 //     next();
 // });
-app.use(cors());
 app.get('/', (req, res,next) => {
     res.status('200').json({message:'Service is up'});
     next();
 });
-//routers
+app.use((req, res,next) => {
+    const error = new Error('Not Found');
+    error.status=400;
+    next(error);
+});
+//error registration with middleware
+app.use((error,req,res,next) => {
+    res.status(error.status || 500).json({
+        error:{
+            message:error.message,
+            status:error.status,
+        },
+    });
+    next(error);
+});
+//routers app.use("/register",registrationRouter)
 
 module.exports = app;
