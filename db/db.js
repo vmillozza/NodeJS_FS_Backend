@@ -21,7 +21,7 @@ const disconnect =async()=>{
     }
 }
 const findUser =async(obj)=>{
-    User.findOne(obj)
+    User.findOne(obj).exec();
 }
 const saveUser =async(newuser)=>{
     await  newuser.save();
