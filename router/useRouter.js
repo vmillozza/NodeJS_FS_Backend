@@ -59,43 +59,84 @@ router.post('/', (req, res, next) => {
 
 });
 router.post('/register', (req, res, next) => {
-    let newUser;  // Dichiarato qui in modo che possa essere accessibile in tutti i blocchi .then()
-    console.log('req.body=>',req.body);
-    findUser({ email: req.body.email }).then(user=>{
-        if(user){
-            console.log('user=>',user);
-            return res.status().json({message:'Utente esistente fai il login'})
-        }
-        else{
+    findUser({ email: req.body.email })
+        .then(user => {
+            if (user) {
+                console.log('user=>', user);
+                return res.status(409).json({ message: 'Utente esistente fai il login' });
+            }
+
             console.log('Mi registro');
-            const user = new User();
-            const newUser = Object.assign(user,req.body); 
+            const userObj = new User();
+            const newUser = Object.assign(userObj, req.body);
 
-            bcrypt.hash(req.body.password,10,function(err,hash){
-                if(err){
-                    return res.status(501).json({message:'Error: ' + error.message});
-                }
-                else{
-                    newUser._id = new mongoose.Types.ObjectId();
-                    newUser.password = hash;
-                    const dbUser = saveUser(newUser);
-                    return res.status(201).json({message:'Registrazione avvenuta con successo: ' ,user});
+            bcrypt.hash(req.body.password, 10, (err, hash) => {
+                if (err) {
+                    return res.status(501).json({ message: 'Error: ' + err.message });
                 }
 
+                newUser._id = new mongoose.Types.ObjectId();
+                newUser.password = hash;
+                saveUser(newUser)
+                    .then((user) => {
+                        return res.status(201).json({
+                            message: 'Registrazione avvenuta con successo: ',
+                            user: user
+                        });
+                    })
+                    .catch((err) => {
+                        return res.status(501).json({
+                            error: {
+                                message: err.message,
+                                status: err.status,
+                            },
+                        });
+                    });
             });
-        }
-    })
-    .catch((err)=>{
-        error:{
-            message:err.message; 
-
-        }
-    } )    
+        })
+        .catch(err => {
+            // handle global error
+            console.error(err);
+            res.status(500).json({ error: err.message });
+        });
 });
+
 
 
 router.post('/login', (req, res, next) => {
+    const { email, password } = req.body;
 
+    if (!email || !password) {
+        return res.status(400).json({ message: 'Email e password sono richiesti.' });
+    }
 
+    // Cerca l'utente nel database utilizzando l'email
+    findUser({ email: email })
+        .then(user => {
+            // Se non esiste un utente con l'email fornita
+            if (!user) {
+                return res.status(401).json({ message: 'Email o password non corretta.' });
+            }
+
+            // Confronta la password fornita con quella memorizzata nel database
+            bcrypt.compare(password, user.password, (err, result) => {
+                if (err) {
+                    return res.status(500).json({ message: 'Errore interno del server.' });
+                }
+                
+                if (result) {  // Se la password corrisponde
+                    // Potresti voler generare un token JWT qui per l'autenticazione basata su token, 
+                    // ma per ora, restituiremo semplicemente un messaggio di successo
+                    return res.status(200).json({ message: 'Login effettuato con successo.' });
+                } else {
+                    return res.status(401).json({ message: 'Email o password non corretta.' });
+                }
+            });
+        })
+        .catch(err => {
+            console.error(err);
+            return res.status(500).json({ message: 'Errore interno del server.' });
+        });
 });
+
 module.exports = router;
