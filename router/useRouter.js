@@ -1,4 +1,5 @@
 const express = require('express');
+const { saveUser } = require('../db/db');
 const router = express.Router();
 
 router.get('/', (req, res, next) => {
@@ -55,7 +56,7 @@ router.post('/', (req, res, next) => {
 
 });
 router.post('/register', (req, res, next) => {
-   
+   saveUser(newUser);
 
 });
 router.post('/login', (req, res, next) => {
