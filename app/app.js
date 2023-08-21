@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const usrRouter = require('../router/useRouter');
 const app = express();
 // app.use(express.json()); è un'espressione comune utilizzata nelle applicazioni Express.js per aggiungere il middleware express.json(). Questo middleware analizza i corpi delle richieste in entrata codificati come JSON.
 
@@ -58,6 +59,7 @@ app.get('/', (req, res,next) => {
     res.status('200').json({message:'Service is up'});
     next();
 });
+app.use('/users',usrRouter);
 app.use((req, res,next) => {
     const error = new Error('Not Found');
     error.status=400;
