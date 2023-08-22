@@ -4,6 +4,7 @@ const User = require("../models/userModel")
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const { default: mongoose } = require('mongoose');
+const { loginUser } = require('../services/userServices');
 
 router.get('/', (req, res, next) => {
     res.status(200).json({
@@ -103,40 +104,6 @@ router.post('/register', (req, res, next) => {
 
 
 
-router.post('/login', (req, res, next) => {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-        return res.status(400).json({ message: 'Email e password sono richiesti.' });
-    }
-
-    // Cerca l'utente nel database utilizzando l'email
-    findUser({ email: email })
-        .then(user => {
-            // Se non esiste un utente con l'email fornita
-            if (!user) {
-                return res.status(401).json({ message: 'Email o password non corretta.' });
-            }
-
-            // Confronta la password fornita con quella memorizzata nel database
-            bcrypt.compare(password, user.password, (err, result) => {
-                if (err) {
-                    return res.status(500).json({ message: 'Errore interno del server.' });
-                }
-                
-                if (result) {  // Se la password corrisponde
-                    // Potresti voler generare un token JWT qui per l'autenticazione basata su token, 
-                    // ma per ora, restituiremo semplicemente un messaggio di successo
-                    return res.status(200).json({ message: 'Login effettuato con successo.' });
-                } else {
-                    return res.status(401).json({ message: 'Email o password non corretta.' });
-                }
-            });
-        })
-        .catch(err => {
-            console.error(err);
-            return res.status(500).json({ message: 'Errore interno del server.' });
-        });
-});
+router.post('/login',loginUser);
 
 module.exports = router;

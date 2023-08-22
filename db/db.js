@@ -25,13 +25,16 @@ const findUser = async (obj) => {
         const user = await User.findOne(obj).exec();
         if (!user) {
             console.log("Nessun utente trovato con quell'indirizzo email.");
-            return;
+            return null;
         }
         console.log("Utente trovato:", user);
+        return user;
     } catch (error) {
         console.error("Errore durante la ricerca dell'utente:", error);
+        throw error;  // rilancia l'errore se desideri gestirlo al di fuori di questa funzione
     }
 }
+
 const saveUser = async (newuser) => {
     try {
         const savedUser = await newuser.save();
