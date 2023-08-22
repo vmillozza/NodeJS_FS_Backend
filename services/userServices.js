@@ -1,7 +1,9 @@
 const { findUser } = require('../db/db');
 const jwt = require('jsonwebtoken');
-require('dotenv').config();
+require('dotenv').config(); 
+const User = require('../models/userModel'); // Adatta questo percorso
 const bcrypt = require('bcrypt');
+const mongoose = require('mongoose');
 
 exports.loginUser = async (req, res) => {
     try {
@@ -41,6 +43,51 @@ exports.loginUser = async (req, res) => {
 }
 
 
-exports.registerUser = (req, res) => {
 
+
+exports.registerUser = (req, res) => {
+    console.log('req.body.email=>', req.body.email);
+    
+    findUser({ email: req.body.email })
+        .then(user => {
+            if (user) {
+                console.log('user=>', user);
+                return res.status(409).json({ message: 'Utente esistente fai il login' });
+            }
+
+            console.log('Mi registro');
+            const newUser = new User(req.body); // Puoi assegnare direttamente la richiesta al modello
+
+            bcrypt.hash(req.body.password, 10, (err, hash) => {
+                if (err) {
+                    console.error('Error during hashing:', err);
+                    return res.status(501).json({ message: 'Error: ' + err.message });
+                }
+
+                newUser._id = new mongoose.Types.ObjectId();
+                newUser.password = hash;
+                
+                newUser.save() // Utilizzando direttamente il metodo .save() del modello
+                    .then((user) => {
+                        return res.status(201).json({
+                            message: 'Registrazione avvenuta con successo',
+                            user: user
+                        });
+                    })
+                    .catch((err) => {
+                        console.error('Error during user saving:', err);
+                        return res.status(501).json({
+                            error: {
+                                message: err.message,
+                                status: err.status,
+                            },
+                        });
+                    });
+            });
+        })
+        .catch(err => {
+            // handle global error
+            console.error('Global error:', err);
+            res.status(500).json({ error: err.message });
+        });
 }
